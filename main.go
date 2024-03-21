@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -26,6 +27,10 @@ type Match struct {
 func main() {
 	r := gin.Default()
 
+	config := cors.DefaultConfig()
+	config.AllowOrigins = []string{"*"} // Permitir solicitudes desde cualquier origen
+	r.Use(cors.New(config))
+
 	dsn := "host=localhost user=postgres password=postgres dbname=cuadrangular port=5432 sslmode=disable"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
@@ -43,7 +48,7 @@ func main() {
 
 		db.Create(&teams)
 
-		c.JSON(200, gin.H{"message": "Teams registered successfully"})
+		c.JSON(200, gin.H{"message": "Teams registered successfully", "Data": teams})
 	})
 
 	r.POST("/api/matches", func(c *gin.Context) {
